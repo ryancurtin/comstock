@@ -1,4 +1,3 @@
-require 'json'
 
 class Trader
 

@@ -1,10 +1,13 @@
 require 'httparty'
 require 'base64'
 require 'openssl'
+require 'json'
 
-module Interface
+class Interface
+  attr_reader :header_info
+
   def initialize
-    @api_info ||= JSON.parse(File.read('keys.json'))
+    @header_info ||= JSON.parse(File.read('keys.json'))
   end
 
   def get_price
