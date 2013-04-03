@@ -11,7 +11,7 @@ class Interface
   end
 
   def get_price
-    self.class.get("https://api.bitfloor.com/book/L1/1").parsed_response
+    HTTParty.get("https://api.bitfloor.com/book/L1/1").parsed_response
   end
 
   def buy_bitcoins(price, size)
