@@ -1,19 +1,27 @@
+require 'redis'
 
 class Trader
-
+  include Interface
   attr_reader :api_info
   attr_accessor :time
 
   def initialize(time=nil)
     # api info hash
     # key, secret, host (base url), data_port, order_port
-    @interface ||= Interface.new(@api_info)
+    $data = Redis.new
+
+    @order_book ||= OrderBook.new
+    @order_book.last_day_price = Interface.get_last_day_price
     @time = time
     # Asks for time we should leave bot running
     if time
       Thread.new{
         Timeout::timeout(time) {
-          #execute trading strategy
+          # execute trading strategy
+          # want to include parameters for money willing to spend
+          # need an order book to store time of quotes
+          # calculate a weighted moving average of prices
+          # make a buy when price dips below moving average
         }
       }
     else
@@ -22,7 +30,7 @@ class Trader
   end
 
   def update_price
-    price = @interface.get_price
+    price = Interface.get_price
 
     @bid = price['bid']
     @ask = price['ask']
