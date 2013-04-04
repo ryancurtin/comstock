@@ -6,8 +6,6 @@ class Trader
   attr_accessor :time
 
   def initialize(time=nil)
-    # api info hash
-    # key, secret, host (base url), data_port, order_port
     $data = Redis.new
 
     @order_book ||= OrderBook.new

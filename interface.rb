@@ -6,6 +6,8 @@ require 'json'
 module Interface
   attr_reader :header_info
 
+  @header_info = JSON.parse(File.read('keys.json'))
+
   API_URLS = {
     :get_price => "https://api.bitfloor.com/book/L1/1",
     :get_last_day_price => "https://api.bitfloor.com/day-info/1",
@@ -16,11 +18,6 @@ module Interface
     :check_open_orders => "https://api.bitfloor.com/orders",
     :check_account_info => "https://api.bitfloor.com/accounts"
   }
-
-  def initialize
-    # @order_book = OrderBook.new
-    @header_info ||= JSON.parse(File.read('keys.json'))
-  end
 
   def self.get_price
     HTTParty.get(API_URLS[:get_price]).parsed_response
