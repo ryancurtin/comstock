@@ -23,6 +23,8 @@ Next, I'm using the wonderful *HTTParty* gem for pulling data from the REST API:
 
     gem install httparty
 
+Lastly, update keys.json to use your own API key / secret (ports must be 443 for https)
+
 You can run the trader from the command line, as I haven't gotten around to building a decent
 CLI (yet)
 
