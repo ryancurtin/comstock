@@ -54,8 +54,6 @@ class Trader
           end
         }
       }
-    else
-
     end
   end
 
