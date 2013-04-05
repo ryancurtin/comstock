@@ -1,14 +1,20 @@
 require 'redis'
 require 'logger'
+require 'timeout'
 
 class Trader
   include Interface
   attr_reader :api_info
   attr_accessor :time
 
-  def initialize(time=nil, opttions={})
+  def initialize(time=600, opttions={})
     $data = Redis.new
     $logger = Logger.new('comstock')
+
+    # Percentage change required to trigger buy/sell signal
+    # Set in Redis so they can be changed dynamically
+    $data.set('buy_threshold', -0.01)
+    $data.set('sell_threshold', 0.03)
 
     # Getting initial account balances and setting paramaters for trader
     # May look to stop execution if defaults are not provided
@@ -23,38 +29,34 @@ class Trader
     @order_book.last_day_price = Interface.get_last_day_price
 
     # Asks for time we should leave bot running
-    if time
-      Thread.new{
-        Timeout::timeout(time) {
-          # execute trading strategy
-          # want to include parameters for money willing to spend
-          # need an order book to store time of quotes
-          # calculate a weighted moving average of prices
-          # make a buy when price dips below moving average
-          @stop_selling = false
-          @stop_buying = false
+    Timeout::timeout(time) {
+      # execute trading strategy
+      # want to include parameters for money willing to spend
+      # need an order book to store time of quotes
+      # calculate a weighted moving average of prices
+      # make a buy when price dips below moving average
+      @stop_selling = false
+      @stop_buying = false
 
-          while true
-            update_price
-            @stop_buying = true if (@order_book.spent + @ask*trade_size) >= buy_limit
-            @stop_selling = true if (@order_book.spent + @bid*trade_size) >= sell_limit
+      while true
+        update_price
+        @stop_buying = true if (@order_book.spent + @ask*trade_size) >= buy_limit
+        @stop_selling = true if (@order_book.spent + @bid*trade_size) >= sell_limit
 
-            # TODO:  Throttle the buy / sell threshold using redis
-            hourly_moving_average = @order_book.hourly_moving_average.to_f
-            if (@ask - hourly_moving_average) / hourly_moving_average < -0.01 && @stop_buying != true
-              $logger.info "Purchasing #{trade_size} BTC at $#{@ask}/BTC, for a total of #{trade_size.to_f * @ask}"
-              @order_book.process_order(Interface.buy_bitcoins(@ask, trade_size), @ask, trade_size, 0)
-            elsif (@bid - hourly_moving_average).to_f / hourly_moving_average.to_f > 0.03 && @stop_selling != true
-              $logger.info "Selling #{trade_size} BTC at $#{@bid}/BTC, for a total of #{trade_size.to_f * @bid}"
-              @order_book.process_order(Interface.sell_bitcoins(@bid, trade_size), @bid, trade_size, 1)
-            end
+        # TODO:  Throttle the buy / sell threshold using redis
+        hourly_moving_average = @order_book.hourly_moving_average.to_f
+        if (@ask - hourly_moving_average) / hourly_moving_average < $data.get('buy_threshold') && @stop_buying != true
+          $logger.info "Purchasing #{trade_size} BTC at $#{@ask}/BTC, for a total of #{trade_size.to_f * @ask}"
+          @order_book.process_order(Interface.buy_bitcoins(@ask, trade_size), @ask, trade_size, 0)
+        elsif (@bid - hourly_moving_average).to_f / hourly_moving_average.to_f > $data.get('sell_threshold') && @stop_selling != true
+          $logger.info "Selling #{trade_size} BTC at $#{@bid}/BTC, for a total of #{trade_size.to_f * @bid}"
+          @order_book.process_order(Interface.sell_bitcoins(@bid, trade_size), @bid, trade_size, 1)
+        end
 
-            # Re-runs every minute
-            sleep 60
-          end
-        }
-      }
-    end
+        # Re-runs every minute
+        sleep 60
+      end
+    }
   end
 
   def update_price
