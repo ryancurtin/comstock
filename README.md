@@ -15,15 +15,15 @@ Eventually, I'd like to incorporate historical data and use a more sophisticated
 How Do I Use This Thing?
 --------
 
-I'm using *redis* as a datastore, so you'll need to install that:
+I'm using **redis** as a datastore, so you'll need to install that:
 
     brew install redis
 
-Next, I'm using the wonderful *HTTParty* gem for pulling data from the REST API:
+Next, I'm using the wonderful **HTTParty** gem for pulling data from the REST API:
 
     gem install httparty
 
-Lastly, update keys.json to use your own API key / secret (ports must be 443 for https)
+Lastly, update **keys.json** to use your own API key / secret (ports must be 443 for https)
 
 You can run the trader from the command line, as I haven't gotten around to building a decent
 CLI (yet)
