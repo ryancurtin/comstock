@@ -12,6 +12,7 @@ module Interface
     :get_price => "https://api.bitfloor.com/book/L1/1",
     :get_last_day_price => "https://api.bitfloor.com/day-info/1",
     :get_last_100_trades => "https://api.bitfloor.com/trades/1",
+    :get_account_info => "https://api.bitfloor.com/accounts"
     :buy_bitcoins => "https://api.bitfloor.com/order/new",
     :sell_bitcoins => "https://api.bitfloor.com/order/new",
     :check_order_status => "https://api.bitfloor.com/order/details",
@@ -23,7 +24,7 @@ module Interface
     HTTParty.get(API_URLS[:get_price]).parsed_response
   end
 
-  def get_last_day_price
+  def self.get_last_day_price
     HTTParty.get(API_URLS[:last_day_price]).parsed_response
   end
 
@@ -33,6 +34,10 @@ module Interface
     else
       HTTParty.get(API_URLS[:get_last_100_trades]).parsed_response
     end
+  end
+
+  def self.get_account_info
+    HTTParty.get(API_URLS[:get_account_info]).parsed_response
   end
 
   def self.buy_bitcoins(price, size)
