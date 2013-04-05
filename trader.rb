@@ -30,6 +30,8 @@ class Trader
 
     # Asks for time we should leave bot running
     Timeout::timeout(time) {
+      start_time = Time.now
+
       # execute trading strategy
       # want to include parameters for money willing to spend
       # need an order book to store time of quotes
@@ -40,6 +42,10 @@ class Trader
 
       while true
         update_price
+
+        $logger.info "Running for #{((Time.now - start_time) / 60).to_i} minutes..."
+        $logger.info "The current price of bitcoin is #{@ask}"
+        
         @stop_buying = true if (@order_book.spent + @ask*trade_size) >= buy_limit
         @stop_selling = true if (@order_book.spent + @bid*trade_size) >= sell_limit
 
