@@ -39,11 +39,12 @@ class Trader
             @stop_buying = true if (@order_book.spent + @ask*trade_size) >= buy_limit
             @stop_selling = true if (@order_book.spent + @bid*trade_size) >= sell_limit
 
+            # TODO:  Throttle the buy / sell threshold using redis
             hourly_moving_average = @order_book.hourly_moving_average.to_f
             if (@ask - hourly_moving_average) / hourly_moving_average < -0.01 && @stop_buying != true
               $logger.info "Purchasing #{trade_size} BTC at $#{@ask}/BTC, for a total of #{trade_size.to_f * @ask}"
               @order_book.process_order(Interface.buy_bitcoins(@ask, trade_size), @ask, trade_size, 0)
-            elsif (@bid - hourly_moving_average).to_f / hourly_moving_average.to_f > 0.01 && @stop_selling != true
+            elsif (@bid - hourly_moving_average).to_f / hourly_moving_average.to_f > 0.03 && @stop_selling != true
               $logger.info "Selling #{trade_size} BTC at $#{@bid}/BTC, for a total of #{trade_size.to_f * @bid}"
               @order_book.process_order(Interface.sell_bitcoins(@bid, trade_size), @bid, trade_size, 1)
             end
