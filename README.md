@@ -17,11 +17,11 @@ How Do I Use This Thing?
 
 I'm using *redis* as a datastore, so you'll need to install that:
 
-> brew install redis
+    brew install redis
 
 Next, I'm using the wonderful *HTTParty* gem for pulling data from the REST API:
 
-> gem install httparty
+    gem install httparty
 
 You can run the trader from the command line, as I haven't gotten around to building a decent
 CLI (yet)
@@ -30,8 +30,12 @@ Contribute
 ---------
 
 Pull requests are more than welcome, as usual:
+
 1. Fork this repo
+
 2. Create a branch with excellent code (`git checkout -b excellence`)
+
 3. Commit the new code, push to your forked repo (`git push origin excellence`)
+
 4. Create a pull request, and I promise I'll look at it
 
