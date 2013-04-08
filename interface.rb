@@ -10,15 +10,15 @@ module Interface
   @header_info = JSON.parse(File.read('keys.json'))
 
   API_URLS = {
-    :get_price => "https://api.testnet.bitfloor.com/book/L1/1",
-    :get_last_day_price => "https://api.testnet.bitfloor.com/day-info/1",
-    :get_last_100_trades => "https://api.testnet.bitfloor.com/trades/1",
-    :get_account_info => "https://api.testnet.bitfloor.com/accounts",
-    :buy_bitcoins => "https://api.testnet.bitfloor.com/order/new",
-    :sell_bitcoins => "https://api.testnet.bitfloor.com/order/new",
-    :check_order_status => "https://api.testnet.bitfloor.com/order/details",
-    :check_open_orders => "https://api.testnet.bitfloor.com/orders",
-    :check_account_info => "https://api.testnet.bitfloor.com/accounts"
+    :get_price => "#{@header_info['host']}/book/L1/1",
+    :get_last_day_price => "#{@header_info['host']}/day-info/1",
+    :get_last_100_trades => "#{@header_info['host']}/trades/1",
+    :get_account_info => "#{@header_info['host']}/accounts",
+    :buy_bitcoins => "#{@header_info['host']}/order/new",
+    :sell_bitcoins => "#{@header_info['host']}/order/new",
+    :check_order_status => "#{@header_info['host']}/order/details",
+    :check_open_orders => "#{@header_info['host']}/orders",
+    :check_account_info => "#{@header_info['host']}/accounts"
   }
 
   def self.get_price

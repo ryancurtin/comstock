@@ -15,6 +15,15 @@ Eventually, I'd like to incorporate historical data and use a more sophisticated
 How Do I Use This Thing?
 --------
 
+I have the bot using the test API, but to change over to trading real money (AT YOUR OWN RISK),
+you must change the **host** in **keys.json** from:
+
+    "https://api.testnet.bitfloor.com"
+
+to:
+
+    "https://api.bitfloor.com"
+
 I'm using **redis** as a datastore, so you'll need to install that:
 
     brew install redis
@@ -22,6 +31,8 @@ I'm using **redis** as a datastore, so you'll need to install that:
 Next, I'm using the wonderful **HTTParty** gem for pulling data from the REST API:
 
     gem install httparty
+
+Run the command **redis-server** in a separate terminal tab to start redis
 
 Lastly, update **keys.json** to use your own API key / secret (ports must be 443 for https)
 
