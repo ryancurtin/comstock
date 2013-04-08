@@ -12,7 +12,7 @@ I like the idea of passively buying bitcoin because I'm extremely bullish on its
 future, and I just started playing with the [Bitfloor API](https://bitfloor.com/docs/api).  
 Eventually, I'd like to incorporate historical data and use a more sophisticated strategy.
 
-How Do I Use This Thing?
+How Do I Install This Thing?
 --------
 
 I have the bot using the test API, but to change over to trading real money (AT YOUR OWN RISK),
@@ -32,12 +32,24 @@ Next, I'm using the wonderful **HTTParty** gem for pulling data from the REST AP
 
     gem install httparty
 
+Signing requests is a key to the security of the API, but it's kind of a pain.  I used the
+**querystring** gem to make signing requests simple.  Install the gem as well using:
+
+    gem install querystring
+
 Run the command **redis-server** in a separate terminal tab to start redis
 
 Lastly, update **keys.json** to use your own API key / secret (ports must be 443 for https)
 
-You can run the trader from the command line, as I haven't gotten around to building a decent
-CLI (yet)
+How Do I Use This Thing?
+---------
+
+Once you've cloned the repo and updated the keys.json with your relevant information and you have Redis
+running, type the following:
+
+    ruby comstock.rb
+
+You'll be prompted to either use the defaults or choose your own. I tried to make sensible defaults based on the amount of $ and BTC the user has in his/her account, but you can override them at your own risk by entering 'N' at the first prompt.  Good luck, and remember that this has only been run using the test API.  It is in no way ready for real money trading use (yet).
 
 Contribute
 ---------

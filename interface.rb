@@ -38,7 +38,15 @@ module Interface
   end
 
   def self.get_account_info
-    post_request(API_URLS[:get_account_info])
+    post_request(API_URLS[:get_account_info]).parsed_response
+  end
+
+  def self.usd_available
+    get_account_info.select{|acct| acct['currency'] == 'USD'}.first['amount']
+  end
+
+  def self.btc_available
+    get_account_info.select{|acct| acct['currency'] == 'BTC'}.first['amount']
   end
 
   def self.buy_bitcoins(price, size)
@@ -90,8 +98,6 @@ module Interface
     def self.post_request(url, payload={})
       payload.merge!('nonce' => Time.now.to_i)
       headers = build_headers(::QueryString.stringify(payload))
-      puts "headers: #{headers}"
-      puts "payload: #{payload}"
       HTTParty.post(url, { :body => payload, :headers => headers } )
     end
 

@@ -11,6 +11,8 @@ class Trader
     $data = Redis.new
     $logger = Logger.new('comstock')
 
+    update_price
+
     # Percentage change required to trigger buy/sell signal
     # Set in Redis so they can be changed dynamically
     $data.set('buy_threshold', -0.01)
@@ -18,12 +20,12 @@ class Trader
 
     # Getting initial account balances and setting paramaters for trader
     # May look to stop execution if defaults are not provided
-    account_info  = Interface.get_account_info
+    account_info  = options[:acount_info]
     usd_amount    = account_info.select{|acct| acct['currency'] == 'USD'}.first['amount']
     btc_amount    = account_info.select{|acct| acct['currency'] == 'BTC'}.first['amount']
     buy_limit     = options[:buy_limit].to_f || usd_amount.to_f / 10
     sell_limit    = options[:sell_limit].to_f || btc_amount.to_f / 10
-    trade_size    = options[:trade_size].to_f || usd_amount.to_f / 100
+    trade_size    = options[:trade_size].to_f || usd_amount.to_f / 100 / @ask
 
     @order_book ||= OrderBook.new
     @order_book.last_day_price = Interface.get_last_day_price
