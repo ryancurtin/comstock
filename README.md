@@ -44,7 +44,7 @@ Signing requests is a key to the security of the API, but it's kind of a pain.  
 
 Run the command **redis-server** in a separate terminal tab to start redis
 
-Lastly, create a **keys.json** file form **keys_example.json**.  Update **keys.json** to use your own API key / secret / passphrase (ports must be 443 for https)
+Lastly, create a **keys.json** file from **keys_example.json**.  Update **keys.json** to use your own API key / secret / passphrase (ports must be 443 for https)
 
 How Do I Use This Thing?
 ---------
