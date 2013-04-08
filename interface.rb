@@ -77,7 +77,8 @@ module Interface
     headers = {
       'Content-Type' => 'application/x-www-form-urlencoded',
       'bitfloor-key' => @header_info['key'],
-      'bitfloor-sign' => sign
+      'bitfloor-sign' => sign,
+      'bitfloor-passphrase' => @header_info['passphrase']
     }
 
   end
