@@ -1,6 +1,11 @@
 Comstock
 ========
 
+**Disclaimer**: Use at your own risk.  I have not tested this using real money, and I don't want you to lose money!  I plan on using this personally, and I wanted to get the code out there since there aren't many similar projects on Github.  
+
+Thanks, 
+Ryan
+
 The Future of Buying Bitcoin (for me, anyway)
 --------
 
