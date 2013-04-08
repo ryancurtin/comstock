@@ -2,6 +2,7 @@ require 'httparty'
 require 'base64'
 require 'openssl'
 require 'json'
+require 'querystring'
 
 module Interface
   attr_reader :header_info
@@ -9,15 +10,15 @@ module Interface
   @header_info = JSON.parse(File.read('keys.json'))
 
   API_URLS = {
-    :get_price => "https://api.bitfloor.com/book/L1/1",
-    :get_last_day_price => "https://api.bitfloor.com/day-info/1",
-    :get_last_100_trades => "https://api.bitfloor.com/trades/1",
-    :get_account_info => "https://api.bitfloor.com/accounts"
-    :buy_bitcoins => "https://api.bitfloor.com/order/new",
-    :sell_bitcoins => "https://api.bitfloor.com/order/new",
-    :check_order_status => "https://api.bitfloor.com/order/details",
-    :check_open_orders => "https://api.bitfloor.com/orders",
-    :check_account_info => "https://api.bitfloor.com/accounts"
+    :get_price => "https://api.testnet.bitfloor.com/book/L1/1",
+    :get_last_day_price => "https://api.testnet.bitfloor.com/day-info/1",
+    :get_last_100_trades => "https://api.testnet.bitfloor.com/trades/1",
+    :get_account_info => "https://api.testnet.bitfloor.com/accounts",
+    :buy_bitcoins => "https://api.testnet.bitfloor.com/order/new",
+    :sell_bitcoins => "https://api.testnet.bitfloor.com/order/new",
+    :check_order_status => "https://api.testnet.bitfloor.com/order/details",
+    :check_open_orders => "https://api.testnet.bitfloor.com/orders",
+    :check_account_info => "https://api.testnet.bitfloor.com/accounts"
   }
 
   def self.get_price
@@ -37,7 +38,7 @@ module Interface
   end
 
   def self.get_account_info
-    HTTParty.get(API_URLS[:get_account_info]).parsed_response
+    post_request(API_URLS[:get_account_info])
   end
 
   def self.buy_bitcoins(price, size)
@@ -63,30 +64,34 @@ module Interface
     post_request(API_URLS[:check_account_info])
   end
 
-  def self.build_headers(body)
+  def self.build_headers(payload)
     # Signing the request, per the API: http://bitfloor.com/docs/ai/order-entry/rest
     # The sign field is a sha512-hmac of the request body using the secret key which corresponds to your api key
     # To sign your request: base64 decode the secret key into the raw bytes (64 bytes)
     # Use those bytes for your sha512-hmac signing of the http request body
     # Base64 encode the signing result and send in this header field
 
-    secret_key = Base64.strict_decode64(@header_info['key'])
+    secret_key = Base64.strict_decode64(@header_info['secret'])
     hmac = OpenSSL::HMAC.new(secret_key, OpenSSL::Digest::Digest.new('SHA512'))
-    sign = Base64.strict_encode64(hmac.update(body).digest)
+    sign = Base64.strict_encode64(hmac.update(payload).digest)
 
-    headers = {
-      'Content-Type' => 'application/x-www-form-urlencoded',
-      'bitfloor-key' => @header_info['key'],
-      'bitfloor-sign' => sign,
-      'bitfloor-passphrase' => @header_info['passphrase']
-    }
+    headers = {}
+    headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    headers['bitfloor-key'] = @header_info['key']
+    headers['bitfloor-sign'] = sign
+    headers['bitfloor-passphrase'] = @header_info['passphrase']
+    headers['bitfloor-version'] = "1"
 
+    return headers
   end
 
   private
     
     def self.post_request(url, payload={})
-      headers = build_headers(payload.merge('nonce' => Time.now.to_i).to_s)
+      payload.merge!('nonce' => Time.now.to_i)
+      headers = build_headers(::QueryString.stringify(payload))
+      puts "headers: #{headers}"
+      puts "payload: #{payload}"
       HTTParty.post(url, { :body => payload, :headers => headers } )
     end
 
