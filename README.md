@@ -3,7 +3,8 @@ Comstock
 
 **Disclaimer**: Use at your own risk.  I have not tested this using real money, and I don't want you to lose money!  I plan on using this personally, and I wanted to get the code out there since there aren't many similar projects on Github.  
 
-Thanks, 
+Thanks,
+
 Ryan
 
 The Future of Buying Bitcoin (for me, anyway)
@@ -17,21 +18,26 @@ I like the idea of passively buying bitcoin because I'm extremely bullish on its
 future, and I just started playing with the [Bitfloor API](https://bitfloor.com/docs/api).  
 Eventually, I'd like to incorporate historical data and use a more sophisticated strategy.
 
-How Do I Install This Thing?
+Installation - Not as bad as it looks
 --------
 
-I have the bot using the test API, but to change over to trading real money (AT YOUR OWN RISK),
+I have the bot using the test API by default, but to change over to trading real money (AT YOUR OWN RISK),
 you must change the **host** in **keys.json** from:
 
-    "https://api.testnet.bitfloor.com"
+    https://api.testnet.bitfloor.com
 
 to:
 
-    "https://api.bitfloor.com"
+    https://api.bitfloor.com
 
-I'm using **redis** as a datastore, so you'll need to install that:
+I'm using **redis** as a datastore, so you'll need to install that on your machine and grab the gem.
+If you want to persist the trade data easily for storage, install the redis-dump gem as well:
 
     brew install redis
+
+    gem install redis
+
+    gem install redis-dump
 
 Next, I'm using the wonderful **HTTParty** gem for pulling data from the REST API:
 
@@ -42,15 +48,31 @@ Signing requests is a key to the security of the API, but it's kind of a pain.  
 
     gem install querystring
 
-Run the command **redis-server** in a separate terminal tab to start redis
-
 Lastly, create a **keys.json** file from **keys_example.json**.  Update **keys.json** to use your own API key / secret / passphrase (ports must be 443 for https)
+
+Real-Time Market Data (optional, but highly recommended)
+---------
+
+What would a trading bot be without real-time data?  I'm using [node](http://nodejs.org/) and [socket.io](http://socket.io) to serve data to the trading bot.  Once you have node.js installed, run the following:
+
+    npm install socket.io
+
+    npm install socket.io-client
+
+These modules will allow us to connect to the [Bitfloor Feed](https://testnet.bitfloor.com/docs/api/market-data/websocket) and serve the freshest market data to our application.  Once you've installed this, see below to get our trading bot started.
 
 How Do I Use This Thing?
 ---------
 
-Once you've cloned the repo and updated the keys.json with your relevant information and you have Redis
-running, type the following:
+Once you've cloned the repo and updated the keys.json with your relevant information, start **redis**:
+
+    redis-server
+
+If you installed the live market data module above (highly recommended), run the node process in a separate window.  The data will be stored in redis and accessed by the ruby client as it's available:
+
+    node market_data.js
+
+Finally, you can start the trader:
 
     ruby comstock.rb
 
