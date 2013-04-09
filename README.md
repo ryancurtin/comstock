@@ -74,7 +74,7 @@ If you installed the live market data module above (highly recommended), run the
 
 Finally, you can start the trader:
 
-    ruby comstock.rb
+    ruby lib/comstock.rb
 
 You'll be prompted to either use the defaults or choose your own. I tried to make sensible defaults based on the amount of $ and BTC the user has in his/her account, but you can override them at your own risk by entering 'N' at the first prompt.  Good luck, and remember that this has only been run using the test API.  It is in no way ready for real money trading use (yet).
 
