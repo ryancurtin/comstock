@@ -7,7 +7,8 @@ require 'querystring'
 module Interface
   attr_reader :header_info
 
-  @header_info = JSON.parse(File.read(File.join(File.dirname(__FILE__), '..', "/keys.json")))
+  header_info_path = File.join(File.dirname(__FILE__), '..', "/keys.json")
+  @header_info = JSON.parse(File.read(header_info_path))
 
   API_URLS = {
     :get_price => "#{@header_info['host']}/book/L1/1",
