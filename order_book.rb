@@ -24,20 +24,22 @@ class OrderBook
     # Getting the last 100 trades, checking if there is
     # at least one hour of trade data
     trade_data = Interface.get_last_100_trades
-    last_trade_time = Time.at(trade_data.last['timestamp'])
-    last_trade_seq = trade_data.last['seq']
+    @last_trade_time = Time.at(trade_data.last['timestamp'])
+    @last_trade_seq = trade_data.last['seq']
 
     # Adding first batch of data to cache
-    add_data_to_cache(trade_data)
+    cache_data(trade_data)
 
     # Continuing to add data to the cache if we don't have at least 1 hour of trades
-    while last_trade_time < cutoff_time
+    while @last_trade_time > cutoff_time
+      puts "last trade time: #{@last_trade_time}"
+      puts "cutoff time: #{cutoff_time}"
       $logger.info "Fetching additional trade data..."
       
       # Re-setting the starting point; only relevant if we didn't get at least 1 hour of trades
-      trade_data = Interface.get_last_100_trades(last_trade_seq)
-      last_trade_time = Time.at(trade_data.last['timestamp'])
-      last_trade_seq = trade_data.last['seq']
+      trade_data = Interface.get_last_100_trades(@last_trade_seq)
+      @last_trade_time = Time.at(trade_data.last['timestamp'])
+      @last_trade_seq = trade_data.last['seq']
       
       cache_data(trade_data)
     end
@@ -57,13 +59,15 @@ class OrderBook
   end
 
   def get_hourly_data
+    $logger.info "Getting hourly data for #{Time.now}"
     # Keys of all trades within the last two hours
     trade_keys = $data.smembers(trade_key(Time.now)) + $data.smembers(trade_key(Time.now - 3600))
     
     # Looping through trades to find only trades from last hour
     trades = []
     trade_keys.each do |k|
-      trades << $data.hgetall(k) if k['timestamp'].to_i > cutoff_time.to_i
+      trade = $data.hgetall(k)
+      trades << trade if trade['timestamp'].to_i > (Time.now - 360000).to_i
     end
 
     trades

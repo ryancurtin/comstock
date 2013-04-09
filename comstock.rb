@@ -1,3 +1,5 @@
+# %x(node market_data.js)
+
 require_relative 'interface'
 require_relative 'trader'
 
@@ -6,8 +8,8 @@ usd_amount    = account_info.select{|acct| acct['currency'] == 'USD'}.first['amo
 btc_amount    = account_info.select{|acct| acct['currency'] == 'BTC'}.first['amount']
 
 puts "Account information as of #{Time.now.strftime("%-m/%-d/%y : %H:%M:%S")}: "
-puts "USD Available: #{usd_amount.round(2)}"
-puts "BTC Available: #{btc_amount.round(2)}"
+puts "USD Available: #{usd_amount.to_f.round(2)}"
+puts "BTC Available: #{btc_amount.to_f.round(2)}"
 
 puts "Use defaults? (Enter Y / N) buy limit: 1/10 of the USD in your account, sell_limit: 1/10 of the BTC in your account, individual trade size: 1/100 of the USD in your acccount divided by the market price of BTC"
 defaults = gets.chomp.downcase
@@ -39,9 +41,3 @@ trade_size  ||= nil
 time        ||= nil
 
 Trader.new(600, {:buy_limit => buy_limit, :sell_limit => sell_limit, :trade_size => trade_size, :account_info => account_info})
-
-
-
-
-
-

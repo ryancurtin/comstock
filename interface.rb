@@ -26,7 +26,7 @@ module Interface
   end
 
   def self.get_last_day_price
-    HTTParty.get(API_URLS[:last_day_price]).parsed_response
+    HTTParty.get(API_URLS[:get_last_day_price]).parsed_response
   end
 
   def self.get_last_100_trades(seq=nil)
