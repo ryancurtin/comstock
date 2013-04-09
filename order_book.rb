@@ -1,3 +1,5 @@
+require 'json'
+
 class OrderBook
   include Interface
   attr_accessor :spent, :orders, :data_loaded
@@ -8,7 +10,7 @@ class OrderBook
   end
 
   def trade_key(timestamp)
-    timestamp.strftime("%-m%-d%k")
+    timestamp.strftime("%-m%-d%H").gsub(" ", "")
   end
 
   # ------------------- Data Processing / Caching Methods --------------------- #
@@ -32,8 +34,6 @@ class OrderBook
 
     # Continuing to add data to the cache if we don't have at least 1 hour of trades
     while @last_trade_time > cutoff_time
-      puts "last trade time: #{@last_trade_time}"
-      puts "cutoff time: #{cutoff_time}"
       $logger.info "Fetching additional trade data..."
       
       # Re-setting the starting point; only relevant if we didn't get at least 1 hour of trades
@@ -61,15 +61,14 @@ class OrderBook
   def get_hourly_data
     $logger.info "Getting hourly data for #{Time.now}"
     # Keys of all trades within the last two hours
-    trade_keys = $data.smembers(trade_key(Time.now)) + $data.smembers(trade_key(Time.now - 3600))
-    
+    trade_keys = $data.smembers(trade_key(Time.now)) + $data.smembers(trade_key(Time.now - 3600)) + $data.smembers(trade_key(Time.now - 7200))
+
     # Looping through trades to find only trades from last hour
     trades = []
     trade_keys.each do |k|
       trade = $data.hgetall(k)
       trades << trade if trade['timestamp'].to_i > (Time.now - 360000).to_i
     end
-
     trades
   end
 
@@ -77,6 +76,7 @@ class OrderBook
     load_historical_data unless @data_loaded
     hourly_data = get_hourly_data
 
+    return nil if hourly_data.length <= 0
     average = hourly_data.map{ |trade| trade['price'].to_i }.inject{|sum, price| sum + price}.to_f / hourly_data.length
   end
 
@@ -85,6 +85,13 @@ class OrderBook
   def process_order(order_data, price, trade_size, type)
     @orders << {:timestamp => order_data['timestamp'], :order_id => order_data['order_id']}
     @spent += price * trade_size if type == 0
+  end
+
+  def close_order_book
+    orders = Interface.check_open_orders.to_json
+    File.open('open_order_data.json', 'w') do |f|
+      f.write(orders)
+    end
   end
 
 end

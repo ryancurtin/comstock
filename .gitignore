@@ -1,4 +1,5 @@
 # Can ignore specific files
 .DS_Store
+*_data.json
 keys.json
 npm-debug.log
