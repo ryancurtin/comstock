@@ -40,4 +40,4 @@ sell_limit  ||= nil
 trade_size  ||= nil
 time        ||= nil
 
-Trader.new(600, {:buy_limit => buy_limit, :sell_limit => sell_limit, :trade_size => trade_size, :account_info => account_info})
+Trader.new(time, {:buy_limit => buy_limit, :sell_limit => sell_limit, :trade_size => trade_size, :account_info => account_info})
